@@ -6,9 +6,9 @@ const Person = require('./models/person')
 
 const app = express()
 
-morgan.token('body', (req, res) => {
-  if (req.method === 'POST' || req.method === 'PUT') {
-    return JSON.stringify(req.body)
+morgan.token('body', request => {
+  if (request.method === 'POST' || request.method === 'PUT') {
+    return JSON.stringify(request.body)
   }
   return null
 })
@@ -47,9 +47,7 @@ app.get('/info', (request, response) => {
         <p>${new Date()}</p>`
       )
     })
-    .catch(error => next(error))
 })
-
 
 app.get('/api/persons', (request, response, next) => {
   Person.find({})
@@ -73,7 +71,7 @@ app.get('/api/persons/:id/', (request, response, next) => {
 
 app.delete('/api/persons/:id/', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
