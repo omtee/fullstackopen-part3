@@ -7,7 +7,7 @@ const Person = require('./models/person')
 const app = express()
 
 morgan.token('body', (req, res) => {
-  if (req.method === 'POST') {
+  if (req.method === 'POST' || req.method === 'PUT') {
     return JSON.stringify(req.body)
   }
   return null
@@ -82,12 +82,6 @@ app.delete('/api/persons/:id/', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
-  if (!body.name || !body.number) {
-    return response.status(400).json({
-      error: 'name or number missing'
-    })
-  }
-
   const person = new Person({
     name: body.name,
     number: body.number
@@ -108,7 +102,7 @@ app.put('/api/persons/:id/', (request, response, next) => {
     number: body.number
   }
 
-  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+  Person.findByIdAndUpdate(request.params.id, person, { new: true, runValidators: true })
     .then(updatedPerson => {
       response.json(updatedPerson)
     })
